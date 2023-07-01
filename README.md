@@ -1,2 +1,2 @@
 # PPL_Windows_Client
-A code repository for PPL's Windows client 
+upload PPL's Windows client to github
