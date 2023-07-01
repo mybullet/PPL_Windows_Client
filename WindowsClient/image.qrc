@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>Image/full_black.jpg</file>
-        <file>Image/yellow_button.png</file>
-        <file>Image/gray_button.png</file>
-        <file>Image/icon.png</file>
-    </qresource>
-</RCC>
