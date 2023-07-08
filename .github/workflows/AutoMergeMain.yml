@@ -17,7 +17,7 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
           branch: main
           title: Merge dev to main
           body: Automatically generated pull request to merge dev branch to main branch
@@ -26,5 +26,5 @@ jobs:
       - name: Merge Pull Request
         uses: peter-evans/merge-pull-request-action@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.MY_GITHUB_TOKEN }}
           pull-number: ${{ steps.create_pr.outputs.pull-request-number }}
