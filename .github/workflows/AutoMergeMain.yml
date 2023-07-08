@@ -16,21 +16,21 @@ jobs:
       - name: Create Pull Request
         id: create_pr
         run: |
-          echo "::set-env name=BRANCH_NAME::main"
-          echo "::set-env name=PR_TITLE::Merge dev to main"
-          echo "::set-env name=PR_BODY::Automatically generated pull request to merge dev branch to main branch"
-          echo "::set-env name=PR_LABELS::auto-merge"
-          echo "::set-env name=HEAD_REF::${{ github.ref }}"
-          echo "::set-env name=BASE_REF::${{ env.BRANCH_NAME }}"
+          GITHUB_TOKEN="${{ secrets.MY_GITHUB_TOKEN }}"
+          BASE_URL="https://api.github.com/repos/${{ github.repository }}"
+          PR_URL=$(curl -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" $BASE_URL/pulls -d '{
+            "title": "Merge dev to main",
+            "body": "Automatically generated pull request to merge dev branch to main branch",
+            "head": "dev",
+            "base": "main"
+          }' | jq -r '.html_url')
+          echo "::set-output name=pull-request-url::$PR_URL"
 
       - name: Merge Pull Request
-        uses: repo-sync/github-sync@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
-        with:
-          sourceRepo: ${{ github.repository }}
-          sourceBranch: ${{ env.HEAD_REF }}
-          destinationBranch: ${{ env.BASE_REF }}
-          prTitle: ${{ env.PR_TITLE }}
-          prBody: ${{ env.PR_BODY }}
-          prLabels: ${{ env.PR_LABELS }}
+        run: |
+          GITHUB_TOKEN="${{ secrets.MY_GITHUB_TOKEN }}"
+          PR_URL="${{ steps.create_pr.outputs.pull-request-url }}"
+          PR_NUMBER=$(basename $PR_URL)
+          API_URL="https://api.github.com/repos/${{ github.repository }}/pulls/$PR_NUMBER/merge"
+          curl -X PUT -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" $API_URL
+
