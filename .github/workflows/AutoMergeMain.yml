@@ -1,0 +1,30 @@
+name: Auto Merge Dev to Main
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  merge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Create Pull Request
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          title: Merge dev to main
+          body: Automatically generated pull request to merge dev branch to main branch
+          labels: auto-merge
+
+      - name: Merge Pull Request
+        uses: peter-evans/merge-pull-request-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pull-number: ${{ steps.create_pr.outputs.pull-request-number }}
