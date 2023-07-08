@@ -1,2 +1,2 @@
 # PPL_Windows_Client
-20230702 - upload PPL's Windows client to github
+20230708 - TEST CI/CD 1
