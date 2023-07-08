@@ -15,16 +15,22 @@ jobs:
 
       - name: Create Pull Request
         id: create_pr
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
-          branch: main
-          title: Merge dev to main
-          body: Automatically generated pull request to merge dev branch to main branch
-          labels: auto-merge
+        run: |
+          echo "::set-env name=BRANCH_NAME::main"
+          echo "::set-env name=PR_TITLE::Merge dev to main"
+          echo "::set-env name=PR_BODY::Automatically generated pull request to merge dev branch to main branch"
+          echo "::set-env name=PR_LABELS::auto-merge"
+          echo "::set-env name=HEAD_REF::${{ github.ref }}"
+          echo "::set-env name=BASE_REF::${{ env.BRANCH_NAME }}"
 
       - name: Merge Pull Request
-        uses: peter-evans/merge-pull-request-action@v2
+        uses: repo-sync/github-sync@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
         with:
-          token: ${{ secrets.MY_GITHUB_TOKEN }}
-          pull-number: ${{ steps.create_pr.outputs.pull-request-number }}
+          sourceRepo: ${{ github.repository }}
+          sourceBranch: ${{ env.HEAD_REF }}
+          destinationBranch: ${{ env.BASE_REF }}
+          prTitle: ${{ env.PR_TITLE }}
+          prBody: ${{ env.PR_BODY }}
+          prLabels: ${{ env.PR_LABELS }}
